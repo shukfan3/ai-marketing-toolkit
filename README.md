@@ -4,7 +4,18 @@
 
 ## Live Demo
 
-部署後將 Production URL 更新於此。
+- **GitHub:** https://github.com/shukfan3/ai-marketing-toolkit  
+- **Vercel 一鍵匯入（最快）：** https://vercel.com/new/clone?repository-url=https://github.com/shukfan3/ai-marketing-toolkit  
+  用 GitHub 登入 → 按 Deploy（Install: `pnpm install`，Build: `pnpm build`）
+
+Production URL：（部署後填寫）
+
+**全自動部署（有 Vercel Token 時）：**
+
+```bash
+# https://vercel.com/account/tokens 建立 token
+VERCEL_TOKEN=你的token node scripts/vercel-setup.mjs
+```
 
 ### 發布到 GitHub + Vercel
 
