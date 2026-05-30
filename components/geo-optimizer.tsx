@@ -55,7 +55,7 @@ export function GeoOptimizer() {
         toast.warning("已顯示示範數據", { description: data.error })
       } else {
         toast.message("示範模式", {
-          description: data.message ?? "設定 AI_GATEWAY_API_KEY 可啟用 Gemini 真 AI 分析。",
+          description: data.message ?? "設定 GOOGLE_GENERATIVE_AI_API_KEY 可啟用 Gemini。",
         })
       }
     } catch {

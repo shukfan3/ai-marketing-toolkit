@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { hasAiGateway } from "@/lib/ai"
+import { hasAiConfigured } from "@/lib/ai"
 import { aiFallbackError, generateWithAi } from "@/lib/api-ai-fallback"
 import { analyzerDemoPosts } from "@/lib/demo-data"
 import { jsonError, rateLimitedResponse } from "@/lib/api-utils"
@@ -10,7 +10,7 @@ const DISCLAIMER_AI =
   "此為 AI-assisted 模擬分析，並非 Meta/IG 官方 API 即時數據。貼文為策略推演，非實際爬取。"
 
 const DISCLAIMER_DEMO =
-  "此為示範數據。設定 AI_GATEWAY_API_KEY 後可獲得基於 URL 的 Gemini 模擬分析。"
+  "此為示範數據。設定 GOOGLE_GENERATIVE_AI_API_KEY 後可獲得基於 URL 的 Gemini 分析。"
 
 const bodySchema = z.object({
   pageUrl: z.string().url().max(500),
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
   const { pageUrl, notes } = body
 
-  if (!hasAiGateway()) {
+  if (!hasAiConfigured()) {
     return NextResponse.json({
       posts: analyzerDemoPosts,
       source: "demo" as const,

@@ -60,7 +60,7 @@ export function PostAnalyzer() {
         toast.warning("已顯示示範數據", { description: data.error })
       } else {
         toast.message("示範模式", {
-          description: data.disclaimer ?? "設定 AI_GATEWAY_API_KEY 可啟用 Gemini。",
+          description: data.disclaimer ?? "設定 GOOGLE_GENERATIVE_AI_API_KEY 可啟用 Gemini。",
         })
       }
     } catch {

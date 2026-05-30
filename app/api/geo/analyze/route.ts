@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { hasAiGateway } from "@/lib/ai"
+import { hasAiConfigured } from "@/lib/ai"
 import { aiFallbackError, generateWithAi } from "@/lib/api-ai-fallback"
 import { geoDemoResult } from "@/lib/demo-data"
 import { jsonError, rateLimitedResponse } from "@/lib/api-utils"
@@ -35,13 +35,13 @@ export async function POST(request: Request) {
 
   const { brandName, industry } = body
 
-  if (!hasAiGateway()) {
+  if (!hasAiConfigured()) {
     return NextResponse.json({
       ...geoDemoResult,
       brandName,
       industry,
       source: "demo" as const,
-      message: "未設定 AI_GATEWAY_API_KEY，已顯示示範數據。",
+      message: "未設定 GOOGLE_GENERATIVE_AI_API_KEY，已顯示示範數據。",
     })
   }
 

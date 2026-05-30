@@ -54,7 +54,7 @@ export function CopywriterTool() {
         toast.warning("已顯示示範文案", { description: data.error })
       } else {
         toast.message("示範模式", {
-          description: data.message ?? "設定 AI_GATEWAY_API_KEY 可啟用 Gemini 生成。",
+          description: data.message ?? "設定 GOOGLE_GENERATIVE_AI_API_KEY 可啟用 Gemini。",
         })
       }
     } catch {

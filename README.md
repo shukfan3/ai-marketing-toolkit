@@ -21,36 +21,46 @@ Production URL：（部署後填寫）
 
 「填入 Demo」只預填輸入；仍會呼叫 API（有 key 則真 AI，無 key 則示範數據）。
 
-## AI 設定（Gemini）
+## AI 設定（Gemini 直連 Google）
 
-預設使用 **Vercel AI Gateway** + **`google/gemini-2.5-flash`**（繁中營銷文案表現佳、成本低）。
+使用 **你自己嘅 Google Gemini API key**（唔經 Vercel AI Gateway，帳單喺 Google 控制台）。
 
-1. 到 [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) 建立 API key  
-2. 在 Vercel Project → **Settings → Environment Variables** 加入：
+### 1. 拎 API Key（建議用 AI Studio，最簡單）
+
+1. 打開 https://aistudio.google.com/apikey  
+2. 用 Google 帳號登入（可同 GCP 同一個）  
+3. 按 **Create API key** → 揀 project（例如 My First Project）  
+4. 複製 key（形如 `AIza...`）
+
+你截圖已喺 GCP 啟用 **Gemini API**，上面步驟會用到同一個 project。
+
+（進階）GCP 控制台：Gemini API 頁面 → **管理** → **憑證** → **建立憑證** → **API 金鑰**
+
+### 2. 填入 Vercel
+
+**Settings → Environment Variables**：
 
 | 變數 | 必填 | 說明 |
 |------|------|------|
-| `AI_GATEWAY_API_KEY` | 是（真 AI） | Gateway API key |
-| `AI_MODEL` | 否 | 預設 `google/gemini-2.5-flash` |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | 是 | 剛才複製嘅 Gemini key |
+| `AI_MODEL` | 否 | 預設 `gemini-2.5-flash` |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | 否 | 聯絡表單收件電郵 |
-| `NEXT_PUBLIC_LINKEDIN_URL` | 否 | LinkedIn 個人頁 |
-| `NEXT_PUBLIC_INSTAGRAM_URL` | 否 | Instagram 個人頁 |
 
-3. **Redeploy** 後三個工具會顯示「Gemini AI」標籤。
+可刪除舊嘅 `AI_GATEWAY_API_KEY`（已唔再用）。
 
-本地開發：
+3. **Redeploy**
+
+本地 `.env.local`：
 
 ```bash
-pnpm install
-cp .env.example .env.local
-# 編輯 .env.local 填入 AI_GATEWAY_API_KEY
+GOOGLE_GENERATIVE_AI_API_KEY=AIza你的key
 pnpm dev
 ```
 
 ## 技術棧
 
 - Next.js 16 · React 19 · Tailwind CSS 4 · shadcn/ui  
-- Vercel AI SDK · AI Gateway · Gemini Flash  
+- Vercel AI SDK · **@ai-sdk/google** · Gemini Flash  
 - 簡單 in-memory rate limit（每 IP 每分鐘 15 次）
 
 ## 部署
