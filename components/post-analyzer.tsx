@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -21,10 +22,15 @@ interface ViralPost {
   aiAnalysis: string
 }
 
+const ANALYZER_DISCLAIMER =
+  "AI-assisted 模擬分析：根據專頁 URL 與備註推演爆款策略，非 Meta/IG 官方即時數據。"
+
 export function PostAnalyzer() {
   const [pageUrl, setPageUrl] = useState("")
+  const [notes, setNotes] = useState("")
   const [posts, setPosts] = useState<ViralPost[] | null>(null)
   const [disclaimer, setDisclaimer] = useState<string | null>(null)
+  const [resultSource, setResultSource] = useState<"ai" | "demo" | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards")
 
@@ -35,7 +41,10 @@ export function PostAnalyzer() {
       const res = await fetch("/api/analyzer/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pageUrl }),
+        body: JSON.stringify({
+          pageUrl,
+          notes: notes.trim() || undefined,
+        }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -43,10 +52,15 @@ export function PostAnalyzer() {
         return
       }
       setPosts(data.posts)
-      setDisclaimer(data.disclaimer ?? null)
-      if (data.source === "demo") {
+      setDisclaimer(data.disclaimer ?? ANALYZER_DISCLAIMER)
+      setResultSource(data.source)
+      if (data.source === "ai") {
+        toast.success("Gemini AI 分析完成")
+      } else if (data.error) {
+        toast.warning("已顯示示範數據", { description: data.error })
+      } else {
         toast.message("示範模式", {
-          description: data.disclaimer ?? "已顯示示範數據。",
+          description: data.disclaimer ?? "設定 AI_GATEWAY_API_KEY 可啟用 Gemini。",
         })
       }
     } catch {
@@ -93,16 +107,32 @@ export function PostAnalyzer() {
               支援 Facebook、Instagram、LinkedIn 等主流社群平台網址
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            <div className="flex items-start gap-2 p-3 rounded-lg border border-border/50 bg-secondary/20 text-sm text-muted-foreground">
+              <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
+              <p>{ANALYZER_DISCLAIMER}</p>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 space-y-2">
-                <Label htmlFor="pageUrl">社群專頁網址</Label>
-                <Input
-                  id="pageUrl"
-                  placeholder="https://facebook.com/competitor-page"
-                  value={pageUrl}
-                  onChange={(e) => setPageUrl(e.target.value)}
-                />
+              <div className="flex-1 space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="pageUrl">社群專頁網址</Label>
+                  <Input
+                    id="pageUrl"
+                    placeholder="https://facebook.com/competitor-page"
+                    value={pageUrl}
+                    onChange={(e) => setPageUrl(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="notes">補充備註（可選）</Label>
+                  <Textarea
+                    id="notes"
+                    placeholder="例：對手係精品咖啡店，主要做 Instagram 短片同限時優惠..."
+                    className="min-h-[80px] resize-none"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                  />
+                </div>
               </div>
               <div className="flex gap-3 sm:self-end">
                 <Button onClick={handleAnalyze} disabled={!pageUrl || isLoading}>
@@ -127,19 +157,18 @@ export function PostAnalyzer() {
           </CardContent>
         </Card>
 
-        {disclaimer && posts && (
-          <div className="flex items-start gap-2 p-4 mb-6 rounded-lg border border-border/50 bg-secondary/30 text-sm text-muted-foreground">
-            <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
-            <p>{disclaimer}</p>
-          </div>
-        )}
-
         {posts && (
           <>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-6 flex-wrap gap-2">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Flame className="w-5 h-5 text-orange-400" />
                 近期熱門貼文（按互動率排序）
+                {resultSource === "ai" && (
+                  <Badge variant="secondary" className="text-xs font-normal">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    Gemini AI
+                  </Badge>
+                )}
               </h3>
               <div className="flex gap-2">
                 <Button
@@ -272,6 +301,9 @@ export function PostAnalyzer() {
                   </TableBody>
                 </Table>
               </Card>
+            )}
+            {disclaimer && (
+              <p className="mt-6 text-xs text-muted-foreground text-center">{disclaimer}</p>
             )}
           </>
         )}

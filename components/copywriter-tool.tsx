@@ -24,11 +24,16 @@ const platformIcons: Record<string, React.ReactNode> = {
 export function CopywriterTool() {
   const [inputText, setInputText] = useState("")
   const [generatedCopies, setGeneratedCopies] = useState<CopyVariant[] | null>(null)
+  const [resultSource, setResultSource] = useState<"ai" | "demo" | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
 
   const handleGenerate = async () => {
-    if (!inputText) return
+    if (!inputText.trim()) return
+    if (inputText.trim().length < 10) {
+      toast.error("請輸入至少 10 字產品描述")
+      return
+    }
     setIsLoading(true)
     try {
       const res = await fetch("/api/copywriter/generate", {
@@ -42,9 +47,14 @@ export function CopywriterTool() {
         return
       }
       setGeneratedCopies(data.variants)
-      if (data.source === "demo") {
+      setResultSource(data.source)
+      if (data.source === "ai") {
+        toast.success("Gemini AI 文案已生成")
+      } else if (data.error) {
+        toast.warning("已顯示示範文案", { description: data.error })
+      } else {
         toast.message("示範模式", {
-          description: "已顯示示範文案。設定 AI_GATEWAY_API_KEY 可啟用真 AI 生成。",
+          description: data.message ?? "設定 AI_GATEWAY_API_KEY 可啟用 Gemini 生成。",
         })
       }
     } catch {
@@ -132,8 +142,14 @@ export function CopywriterTool() {
                 <MessageSquare className="w-5 h-5 text-primary" />
                 智能文案輸出
               </CardTitle>
-              <CardDescription>
-                切換不同平台查看對應風格的文案
+              <CardDescription className="flex flex-wrap items-center gap-2">
+                <span>切換不同平台查看對應風格的文案</span>
+                {resultSource === "ai" && (
+                  <Badge variant="secondary" className="text-xs">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    Gemini AI
+                  </Badge>
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent>

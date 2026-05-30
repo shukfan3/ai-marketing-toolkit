@@ -17,6 +17,8 @@ interface OptimizationResult {
   suggestions: { type: "success" | "warning" | "info"; text: string }[]
   platforms: { name: string; score: number }[]
   source?: "demo" | "ai"
+  error?: string
+  message?: string
 }
 
 const platformIcons: Record<string, React.ReactNode> = {
@@ -47,9 +49,13 @@ export function GeoOptimizer() {
         return
       }
       setResult(data)
-      if (data.source === "demo") {
+      if (data.source === "ai") {
+        toast.success("Gemini AI 分析完成")
+      } else if (data.error) {
+        toast.warning("已顯示示範數據", { description: data.error })
+      } else {
         toast.message("示範模式", {
-          description: "已顯示示範數據。於 Vercel 設定 AI_GATEWAY_API_KEY 可啟用真 AI 分析。",
+          description: data.message ?? "設定 AI_GATEWAY_API_KEY 可啟用 Gemini 真 AI 分析。",
         })
       }
     } catch {
@@ -154,8 +160,14 @@ export function GeoOptimizer() {
                 <TrendingUp className="w-5 h-5 text-primary" />
                 分析結果
               </CardTitle>
-              <CardDescription>
-                {result ? `${result.brandName} 的 AI 可見度報告` : "等待分析..."}
+              <CardDescription className="flex flex-wrap items-center gap-2">
+                <span>{result ? `${result.brandName} 的 AI 可見度報告` : "等待分析..."}</span>
+                {result?.source === "ai" && (
+                  <Badge variant="secondary" className="text-xs">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    Gemini AI
+                  </Badge>
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent>

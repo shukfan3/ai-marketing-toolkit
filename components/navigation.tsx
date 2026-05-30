@@ -16,8 +16,11 @@ export function Navigation() {
   ]
 
   const scrollToSection = (href: string) => {
-    const element = document.querySelector(href)
-    element?.scrollIntoView({ behavior: "smooth" })
+    if (href === "#" || href === "#top") {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    } else {
+      document.querySelector(href)?.scrollIntoView({ behavior: "smooth" })
+    }
     setIsOpen(false)
   }
 
@@ -27,7 +30,7 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <button
-            onClick={() => scrollToSection("#")}
+            onClick={() => scrollToSection("#top")}
             className="flex items-center gap-2 font-bold text-lg"
           >
             <Sparkles className="w-5 h-5 text-primary" />

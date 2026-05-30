@@ -1,68 +1,64 @@
 # Niki Chan | AI 營銷工具箱
 
-個人 portfolio 專案，展示 AI 驅動的數碼營銷工具（v0 生成 UI + Next.js 實作）。
+個人 portfolio 專案，展示 AI 驅動的數碼營銷工具（v0 UI + Next.js + Gemini）。
 
 ## Live Demo
 
 - **GitHub:** https://github.com/shukfan3/ai-marketing-toolkit  
-- **Vercel 一鍵匯入（最快）：** https://vercel.com/new/clone?repository-url=https://github.com/shukfan3/ai-marketing-toolkit  
-  用 GitHub 登入 → 按 Deploy（Install: `pnpm install`，Build: `pnpm build`）
+- **Vercel:** https://vercel.com/new/clone?repository-url=https://github.com/shukfan3/ai-marketing-toolkit  
 
 Production URL：（部署後填寫）
 
-**全自動部署（有 Vercel Token 時）：**
+## 功能（已全部接線）
 
-```bash
-# https://vercel.com/account/tokens 建立 token
-VERCEL_TOKEN=你的token node scripts/vercel-setup.mjs
-```
+| 功能 | 說明 |
+|------|------|
+| GEO 模擬優化器 | Gemini 評分 + 優化建議（ChatGPT / Gemini / Perplexity / Bing AI） |
+| 多平台文案變形 | Threads / LinkedIn / Instagram 三種風格 |
+| 爆款 Post 分析器 | 輸入 URL + 可選備註，AI 推演爆款策略（非爬蟲） |
+| 聯絡表單 | `mailto:` 開啟郵件客戶端發送 |
+| 導航 / 工具卡片 | 平滑捲動至各區塊 |
 
-### 發布到 GitHub + Vercel
+「填入 Demo」只預填輸入；仍會呼叫 API（有 key 則真 AI，無 key 則示範數據）。
 
-**若 `xcode-select --install` 彈出「無法從軟件更新伺服器取得軟件」**（Apple 伺服器問題），請改用 **唔需要 git** 嘅腳本：
+## AI 設定（Gemini）
 
-```bash
-cd ~/Desktop/ai-marketing-toolkit
-chmod +x scripts/publish-no-git.sh
-./scripts/publish-no-git.sh
-```
+預設使用 **Vercel AI Gateway** + **`google/gemini-2.5-flash`**（繁中營銷文案表現佳、成本低）。
 
-腳本會下載 `gh` + `node`、用瀏覽器登入 GitHub、自動建立 repo 並上傳。完成後到 [vercel.com/new](https://vercel.com/new) Import `ai-marketing-toolkit`。
+1. 到 [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) 建立 API key  
+2. 在 Vercel Project → **Settings → Environment Variables** 加入：
 
-**Command Line Tools 裝到之後**（可選，方便之後 `git push`）：
+| 變數 | 必填 | 說明 |
+|------|------|------|
+| `AI_GATEWAY_API_KEY` | 是（真 AI） | Gateway API key |
+| `AI_MODEL` | 否 | 預設 `google/gemini-2.5-flash` |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | 否 | 聯絡表單收件電郵 |
+| `NEXT_PUBLIC_LINKEDIN_URL` | 否 | LinkedIn 個人頁 |
+| `NEXT_PUBLIC_INSTAGRAM_URL` | 否 | Instagram 個人頁 |
 
-- 稍後再試：`xcode-select --install`
-- 或到 [Apple Developer Downloads](https://developer.apple.com/download/all/) 搜尋「Command Line Tools」手動安裝
-- 然後可用：`./scripts/publish.sh`
+3. **Redeploy** 後三個工具會顯示「Gemini AI」標籤。
 
-## 功能
-
-- **GEO 模擬優化器** — 評估品牌在 AI 搜尋引擎的可見度
-- **多平台文案智能變形** — 產品描述轉換為 Threads / LinkedIn / Instagram 風格
-- **同行爆款 Post 分析器** — AI-assisted 競品洞察（非官方社群爬蟲）
-
-每個工具均保留「填入 Demo」按鈕，無 API key 時亦可展示。
-
-## 技術棧
-
-- Next.js 16 · React 19 · Tailwind CSS 4 · shadcn/ui
-- Vercel AI SDK + Vercel AI Gateway（可選 `AI_GATEWAY_API_KEY`）
-
-## 本地開發
+本地開發：
 
 ```bash
 pnpm install
 cp .env.example .env.local
-# 在 .env.local 填入 AI_GATEWAY_API_KEY（可選，用於真 AI 生成）
+# 編輯 .env.local 填入 AI_GATEWAY_API_KEY
 pnpm dev
 ```
 
-## 環境變數
+## 技術棧
 
-| 變數 | 必填 | 說明 |
-|------|------|------|
-| `AI_GATEWAY_API_KEY` | 否 | [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) API key；未設定時 API 回傳 demo 數據 |
+- Next.js 16 · React 19 · Tailwind CSS 4 · shadcn/ui  
+- Vercel AI SDK · AI Gateway · Gemini Flash  
+- 簡單 in-memory rate limit（每 IP 每分鐘 15 次）
 
 ## 部署
 
-連接 GitHub 後由 Vercel 自動 build（`pnpm install` → `pnpm build`）。
+連接 GitHub 後 Vercel 自動 build：`pnpm install` → `pnpm build`。
+
+無 git 時上傳：
+
+```bash
+GITHUB_TOKEN=xxx node scripts/github-upload.mjs
+```
