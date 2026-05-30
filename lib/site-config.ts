@@ -6,20 +6,16 @@ export const siteConfig = {
 
 export function buildMailtoUrl(params: {
   name: string
-  email: string
   subject: string
   message: string
 }): string | null {
   const to = siteConfig.contactEmail
   if (!to) return null
 
-  const subject = params.subject.trim() || `來自 ${params.name} 的查詢`
-  const body = [
-    `姓名：${params.name}`,
-    `電郵：${params.email}`,
-    "",
-    params.message,
-  ].join("\n")
+  const subject =
+    params.subject.trim() ||
+    (params.name.trim() ? `來自 ${params.name.trim()} 的查詢` : "網站查詢")
+  const body = params.message.trim()
 
   return `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }

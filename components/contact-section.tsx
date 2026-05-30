@@ -12,25 +12,19 @@ import { buildMailtoUrl, siteConfig } from "@/lib/site-config"
 
 export function ContactSection() {
   const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
   const [subject, setSubject] = useState("")
   const [message, setMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim() || !email.trim() || !message.trim()) {
-      toast.error("請填寫姓名、電郵及訊息內容")
-      return
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      toast.error("請輸入有效電郵地址")
+    if (!message.trim()) {
+      toast.error("請填寫訊息內容")
       return
     }
 
     const mailto = buildMailtoUrl({
       name: name.trim(),
-      email: email.trim(),
       subject: subject.trim(),
       message: message.trim(),
     })
@@ -44,8 +38,8 @@ export function ContactSection() {
 
     setIsSubmitting(true)
     window.location.href = mailto
-    toast.success("已開啟郵件程式", {
-      description: "請在郵件客戶端確認並發送。",
+    toast.success("已開啟你的郵件程式", {
+      description: "請用你本身的電郵帳號確認並按傳送。",
     })
     setTimeout(() => setIsSubmitting(false), 1500)
   }
@@ -65,7 +59,7 @@ export function ContactSection() {
             聯絡我
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-balance">
-            有任何合作機會或想進一步了解這些工具？歡迎與我聯繫！
+            填寫訊息後會開啟你電腦的郵件 app，用<strong>你自己的電郵</strong>直接寄給我。
           </p>
         </div>
 
@@ -73,36 +67,20 @@ export function ContactSection() {
           <Card className="bg-card/50 backdrop-blur-sm border-border/50">
             <CardContent className="p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label htmlFor="name" className="text-sm font-medium">
-                      姓名
-                    </label>
-                    <Input
-                      id="name"
-                      placeholder="您的姓名"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium">
-                      電郵
-                    </label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-sm font-medium">
+                    姓名 <span className="text-muted-foreground font-normal">（可選）</span>
+                  </label>
+                  <Input
+                    id="name"
+                    placeholder="您的姓名"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="subject" className="text-sm font-medium">
-                    主題
+                    主題 <span className="text-muted-foreground font-normal">（可選）</span>
                   </label>
                   <Input
                     id="subject"
@@ -126,7 +104,7 @@ export function ContactSection() {
                 </div>
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
                   <Send className="w-4 h-4 mr-2" />
-                  {isSubmitting ? "開啟郵件中..." : "發送訊息"}
+                  {isSubmitting ? "開啟郵件中..." : "用我的電郵發送"}
                 </Button>
               </form>
             </CardContent>
